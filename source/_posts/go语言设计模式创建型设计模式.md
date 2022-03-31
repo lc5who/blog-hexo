@@ -291,3 +291,132 @@ func getInstance() *single {
     return singleInstance
 }
 ```
+
+## 对象池模式
+
+用法：当对象创建的开销很大或对象时不时的需要被用到。对象池里的对象不会被销毁
+简单说就是做了个队列，管理池中的对象一般拥有取出，收回的方法
+```golang
+package objectPool
+
+import (
+	"fmt"
+	"sync"
+)
+
+type iPoolObject interface {
+	GetID() string
+}
+type Pool struct {
+	Idle   []iPoolObject
+	Active []iPoolObject
+	Cap    int
+	Mulock *sync.Mutex
+}
+
+func InitPool(poolObjects []iPoolObject) (*Pool, error) {
+	if len(poolObjects) == 0 {
+		return nil, fmt.Errorf("Cannot craete a pool of 0 length")
+	}
+	active := make([]iPoolObject, 0)
+	pool := &Pool{
+		Idle:   poolObjects,
+		Active: active,
+		Cap:    len(poolObjects),
+		Mulock: new(sync.Mutex),
+	}
+	return pool, nil
+}
+func (p *Pool) loan() (iPoolObject, error) {
+	p.Mulock.Lock()
+	defer p.Mulock.Unlock()
+	if len(p.Idle) == 0 {
+		return nil, fmt.Errorf("No pool object free. Please request after sometime")
+	}
+	obj := p.Idle[0]
+	p.Idle = p.Idle[1:]
+	p.Active = append(p.Active, obj)
+	fmt.Printf("Loan Pool Object with ID: %s\n", obj.GetID())
+	return obj, nil
+}
+func (p *Pool) receive(target iPoolObject) error {
+	p.Mulock.Lock()
+	defer p.Mulock.Unlock()
+	err := p.remove(target)
+	if err != nil {
+		return err
+	}
+	p.Idle = append(p.Idle, target)
+	fmt.Printf("Return Pool Object with ID: %s\n", target.GetID())
+	return nil
+}
+
+func (p *Pool) remove(target iPoolObject) error {
+	currentActiveLength := len(p.Active)
+	for i, obj := range p.Active {
+		if obj.GetID() == target.GetID() {
+			p.Active[currentActiveLength-1], p.Active[i] = p.Active[i], p.Active[currentActiveLength-1]
+			p.Active = p.Active[:currentActiveLength-1]
+			return nil
+		}
+	}
+	return fmt.Errorf("Targe Pool object doesn't belong to the Pool")
+}
+
+type Connection struct {
+	Id string
+}
+
+func (c *Connection) GetID() string {
+	return c.Id
+}
+
+```
+
+## 原型模式
+
+```golang
+package prototype
+
+import "fmt"
+
+type Inode interface {
+	Print(string2 string)
+	Clone() Inode
+}
+type File struct {
+	Name string
+}
+
+func (f *File) Print(indentation string) {
+	fmt.Println(indentation + f.Name)
+}
+
+func (f *File) Clone() Inode {
+	return &File{Name: f.Name + "_clone"}
+}
+
+type folder struct {
+	childrens []inode
+	name      string
+}
+
+func (f *folder) print(indentation string) {
+	fmt.Println(indentation + f.name)
+	for _, i := range f.childrens {
+		i.print(indentation + indentation)
+	}
+}
+
+func (f *folder) clone() inode {
+	cloneFolder := &folder{name: f.name + "_clone"}
+	var tempChildrens []inode
+	for _, i := range f.childrens {
+		copy := i.clone()
+		tempChildrens = append(tempChildrens, copy)
+	}
+	cloneFolder.childrens = tempChildrens
+	return cloneFolder
+}
+
+```
