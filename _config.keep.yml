@@ -37,9 +37,9 @@ style:
 
   # First screen
   first_screen:
-    enable: false
+    enable: true
     background_img: /images/bg.svg # You can use local image or image external link
-    description: Keep writing and Keep loving.
+    description: Talk is cheap Show me your code
 
   # Scroll style settings
   scroll:
@@ -81,7 +81,7 @@ menu:
 # ---------------------------------------------------------------------------------------
 home_article:
   category:
-    enable: false # show category in home page article block
+    enable: true # show category in home page article block
     limit: 3 # max number of categories shown in home page article block
   tag:
     enable: true # show tags in home page article block
