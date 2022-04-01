@@ -39,7 +39,7 @@ style:
   first_screen:
     enable: true
     background_img: /images/bg.svg # You can use local image or image external link
-    description: Talk is cheap Show me your code
+    description: Talk is cheap Show me the code
 
   # Scroll style settings
   scroll:
