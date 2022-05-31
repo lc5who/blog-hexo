@@ -4,6 +4,7 @@ date: 2022-05-25 13:49:17
 tags: ethereum
 ---
 
+# github: https://github.com/smartcontractkit/full-blockchain-solidity-course-py
 # Lesson 1. Welcome To Blockchain
 
 1. smart contract && hybrid contract
