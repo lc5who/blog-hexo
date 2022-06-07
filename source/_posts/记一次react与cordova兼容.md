@@ -69,7 +69,9 @@ update package.json file
 1. 创建证书命令:
 keytool -genkey -alias android.keystore -keyalg RSA -validity 36500 -keystore android.keystore
 2. cordova 打包命令:
+```shell
 cordova run android --release -- --keystore=./android.keystore --storePassword=123456 --alias=android.keystore --password=123456 --packageType=apk
+```
 
 
    
